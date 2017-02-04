@@ -3,22 +3,23 @@
 node::node(int i, int j){
   this->i = i;
   this->j = j;
-  this->n_neighbors = 0;
   ostringstream stringStream;
-  stringStream << i << "_" << j;
+  stringStream << "_" << i << "_" << j;
   this->id = stringStream.str();
+  this->neighbors = new map<string, node *>;
 };
 
 node::node(const node &obj){
   this->i = obj.i;
   this->j = obj.j;
   this->id = obj.id;
+  this->neighbors = obj.neighbors;
 };
 
-array <float, 2> node::coordinates(){
-  array <float, 2> coords;
-  coords[0] = 0.5*this->i;
-  coords[1] = 0.5*this->j*pow(3.0,0.5);
+coordinates_2d node::coordinates() const {
+  coordinates_2d coords;
+  coords.x.push_back(0.5*this->i);
+  coords.y.push_back(0.5*this->j*pow(3.0,0.5));
   return coords;
 }
 
@@ -34,7 +35,7 @@ bool node::is_connected_to(node *target){
     if (n == target) return true;
     else  visited.insert(n);
 
-    for(auto const& x : n->neighbors){
+    for(auto const& x : *(n->neighbors)){
       if( (visited.find(x.second) == visited.end()) && (queued.find(x.second) == queued.end())){
         dq.push_back(x.second);
         visited.insert(x.second);
@@ -46,9 +47,19 @@ bool node::is_connected_to(node *target){
 };
 
 void node::debond_from(node *n1){
+  if(!this->bonded_to(n1) && !n1->bonded_to(this)){
+      ostringstream stringStream;
+      stringStream << "[debond_from] Nodes not bonded: " << this->id << " " << n1->id << endl;
+      throw invalid_argument(stringStream.str());
+  }
+
+  if(!this->bonded_to(n1) || !n1->bonded_to(this)){
+      ostringstream stringStream;
+      stringStream << "[debond_from] Nodes partially bonded: " << this->id << " " << n1->id << endl;
+      throw invalid_argument(stringStream.str());
+  }
   if (this->bonded_to(n1)){
-    this->neighbors.erase(n1->get_id());
-    this->n_neighbors -= 1;
+    this->neighbors->erase(n1->get_id());
   }
 
   if (n1->bonded_to(this)){
@@ -57,20 +68,30 @@ void node::debond_from(node *n1){
 }
 
 bool node::bonded_to(node *n1){
-  return this->neighbors.find(n1->get_id()) != this->neighbors.end();
+  return this->neighbors->find(n1->get_id()) != this->neighbors->end();
 };
 
 void node::add_neighbor(node *n1){
-  if(! this->bonded_to(n1)){
-    this->neighbors.insert(std::make_pair(n1->get_id(),n1));
-    this->n_neighbors +=1;
+  if(this->bonded_to(n1) && n1->bonded_to(this)){
+      ostringstream stringStream;
+      stringStream << "[add_neighbor] Nodes already bonded: " << this->id << " " << n1->id << endl;
+      throw invalid_argument(stringStream.str());
   }
 
-  if(! n1->bonded_to(this)){
-    n1->add_neighbor(this);
+  if(this->bonded_to(n1) || n1->bonded_to(this)){
+      ostringstream stringStream;
+      stringStream << "[add_neighbor] Nodes partially bonded: " << this->id << " " << n1->id << endl;
+      throw invalid_argument(stringStream.str());
   }
+  this->neighbors->insert(std::make_pair(n1->get_id(),n1));
+  n1->neighbors->insert(std::make_pair(this->get_id(),this));
 };
 
 string node::get_id(){
   return this->id;
 };
+
+std::ostream& operator<< (std::ostream &out, const node &n){
+  out << "Node ID, i, j: " << n.id << ",\t" << n.i << ",\t" << n.j << ", coordinates: " << n.coordinates();
+  return out;
+}

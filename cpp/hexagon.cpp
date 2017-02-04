@@ -36,3 +36,25 @@ hexagon::hexagon(int i, int j, int a){
     this->bonds.push_back(b);
 	}
 }
+
+coordinates_2d hexagon::coordinates(){
+  coordinates_2d coords;
+
+  for(auto const& value: this->nodes) {
+    coords.append(value->coordinates());
+  }
+  return coords;
+}
+
+std::ostream& operator<< (std::ostream &out, const hexagon &h){
+  out << "Hexagon: i, j, a: " << h.i << ", " << h.i << ", " << h.a <<endl;
+  out << h.nodes.size() << " Nodes:" << endl;
+  for(auto const& n: h.nodes) {
+    out << "\t" << (*n);
+  }
+  out << h.bonds.size() << " Bonds:" << endl;
+  for(auto const& b: h.bonds) {
+    out << "\t" << (*b);
+  }
+  return out;
+}
