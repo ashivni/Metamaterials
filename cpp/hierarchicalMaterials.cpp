@@ -32,9 +32,10 @@ void check_connectivity(node *n1, node * n2){
 }
 
 int main(){
-int nx = 5, ny=5, levels=2, l0=1, magnification=6;
+int nx = 4, ny=4, levels=2, l0=1, magnification=6;
 
-  hierarchical_grid hg(nx, ny, levels, l0, magnification,false, false, 0.0);
+  hierarchical_grid hg(nx, ny, levels, l0, magnification,false, false, 0.0, 1.0);
+  hg.build_eqns();
 
   int l = hg.levels;
   ofstream fOut;

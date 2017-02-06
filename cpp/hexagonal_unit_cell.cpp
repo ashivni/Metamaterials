@@ -8,14 +8,14 @@ hexagonal_unit_cell::hexagonal_unit_cell(int i, int j, int a, set<string> * all_
   stringStream << i << "_" << j;
   this->id = stringStream.str();
 
-  if(all_cells->find(this->id) != all_cells->end()){
-    ostringstream stringStream;
-    stringStream << "Unit cell at (" << i << ", " << j << ") already exists";
-    throw invalid_argument(stringStream.str());
-  }
-  else{
+  //if(all_cells->find(this->id) != all_cells->end()){
+  //  ostringstream stringStream;
+  // stringStream << "Unit cell at (" << i << ", " << j << ") already exists";
+  //  throw invalid_argument(stringStream.str());
+  //}
+  //else{
     all_cells->insert(this->id);
-  }
+  //}
 
   this->nodes.push_back(new node(2*i*a, 2*j*a));
   this->nodes.push_back(new node((2*i+1)*a, (2*j+1)*a));
@@ -32,7 +32,7 @@ bool hexagonal_unit_cell::has_neighbor(hexagonal_unit_cell *neigh){
 }
 
 void hexagonal_unit_cell::add_neighbor(hexagonal_unit_cell *neigh, string neigh_type){
-  if(this->has_neighbor(neigh) && neigh->has_neighbor(this)){
+  /*if(this->has_neighbor(neigh) && neigh->has_neighbor(this)){
     ostringstream stringStream;
     stringStream << "[huc::add_neighbor] Unit cells " << this->id << ", " << neigh->id << " are already neighbors";
     throw invalid_argument(stringStream.str());
@@ -41,7 +41,7 @@ void hexagonal_unit_cell::add_neighbor(hexagonal_unit_cell *neigh, string neigh_
     ostringstream stringStream;
     stringStream << "[huc::add_neighbor] Unit cells " << this->id << ", " << neigh->id << " are partial neighbors";
     throw invalid_argument(stringStream.str());
-  }
+  }*/
   vector <int> bond_n1, bond_n2;
   if (neigh_type == "PR" || neigh_type == "R"){
     bond_n1.push_back(0);

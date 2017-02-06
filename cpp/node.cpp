@@ -47,7 +47,7 @@ bool node::is_connected_to(node *target){
 };
 
 void node::debond_from(node *n1){
-  if(!this->bonded_to(n1) && !n1->bonded_to(this)){
+  /*if(!this->bonded_to(n1) && !n1->bonded_to(this)){
       ostringstream stringStream;
       stringStream << "[debond_from] Nodes not bonded: " << this->id << " " << n1->id << endl;
       throw invalid_argument(stringStream.str());
@@ -57,22 +57,23 @@ void node::debond_from(node *n1){
       ostringstream stringStream;
       stringStream << "[debond_from] Nodes partially bonded: " << this->id << " " << n1->id << endl;
       throw invalid_argument(stringStream.str());
-  }
-  if (this->bonded_to(n1)){
+  }*/
+  //if (this->bonded_to(n1)){
     this->neighbors->erase(n1->get_id());
-  }
+  //}
 
-  if (n1->bonded_to(this)){
+  //if (n1->bonded_to(this)){
     n1->debond_from(this);
-  }
+  //}
 }
+
 
 bool node::bonded_to(node *n1){
   return this->neighbors->find(n1->get_id()) != this->neighbors->end();
 };
 
 void node::add_neighbor(node *n1){
-  if(this->bonded_to(n1) && n1->bonded_to(this)){
+  /*if(this->bonded_to(n1) && n1->bonded_to(this)){
       ostringstream stringStream;
       stringStream << "[add_neighbor] Nodes already bonded: " << this->id << " " << n1->id << endl;
       throw invalid_argument(stringStream.str());
@@ -82,9 +83,9 @@ void node::add_neighbor(node *n1){
       ostringstream stringStream;
       stringStream << "[add_neighbor] Nodes partially bonded: " << this->id << " " << n1->id << endl;
       throw invalid_argument(stringStream.str());
-  }
-  this->neighbors->insert(std::make_pair(n1->get_id(),n1));
-  n1->neighbors->insert(std::make_pair(this->get_id(),this));
+  }*/
+  (*(this->neighbors))[n1->get_id()] = n1;
+  (*(n1->neighbors))[this->get_id()] = this;
 };
 
 string node::get_id(){
