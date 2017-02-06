@@ -14,6 +14,7 @@
 #include <cmath>
 #include <algorithm>
 #include <stdexcept>
+#include <limits>
 using namespace std;
 #endif
 
@@ -143,12 +144,13 @@ class hierarchical_grid {
   public:
     int n_step, nx, ny, levels, l0, magnification, a, lx, ly, ly_ind, lx_ind;
     bool notch, damage;
-    double damage_fraction;
+    double damage_fraction, EY;
     hexagonal_grid * outline;
     map<int, map<string, node *> *> * level_nodes;
     map<int, map<string, bond *> *> * level_bonds;
     map<int, map<string, bond *> *> * level_broken_bonds;
     map<int, bool> * level_is_build;
-    hierarchical_grid(int, int, int, int, int, bool, bool, double);
+    hierarchical_grid(int, int, int, int, int, bool, bool, double, double);
+    void build_eqns();
 };
 #endif
