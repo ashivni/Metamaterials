@@ -42,16 +42,16 @@ int nx = 4, ny=4, levels=2, l0=1, magnification=6;
   fOut.open("C_Out.txt");
   while(l >= 0){
     vector <string> node_ids;
-    map <string, node *> nm = *(*(hg.level_nodes))[l];
-    for(auto const & np: nm){
-      node_ids.push_back(np.second->id);
+    my_node_map nm = *(*(hg.level_nodes))[l];
+    for(int k = 0; k < nm.size(); k++){
+      node_ids.push_back(nm.key_at(k));
     }
     sort(node_ids.begin(),node_ids.end());
 
     for(auto const & ni:node_ids){
       vector <string> neigh_ids;
-      for(auto const & neigh_map: *(nm[ni]->neighbors)){
-        neigh_ids.push_back(neigh_map.second->id);
+      for(int k = 0; k < nm.value(ni)->neighbors->size(); k++){
+        neigh_ids.push_back(nm.value(ni)->neighbors->value_at(k)->id);
       }
       sort(neigh_ids.begin(), neigh_ids.end());
       if (l==0){

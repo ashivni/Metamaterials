@@ -45,14 +45,14 @@ hexagonal_grid::hexagonal_grid(int nx, int ny, int level, int magnification, int
   }
 }
 
-map<string, node *> * hexagonal_grid::node_map(){
-  map<string, node *> * m = new map<string, node *> ();
+my_node_map * hexagonal_grid::node_map(){
+  my_node_map * m = new my_node_map();
   for(auto const& huc : this->master_grid){
     for(auto const& n :huc.second->nodes){
       //if(m->find(n->id) != m->end()){
       //  throw invalid_argument("[hexagonal_grid::node_map] Duplicate Node");
       //}
-      (*m)[n->id] = n;
+      (*m).insert(n->id, n);
     }
   }
   return m;

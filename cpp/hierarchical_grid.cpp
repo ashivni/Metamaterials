@@ -17,7 +17,7 @@ hierarchical_grid::hierarchical_grid(int nx, int ny, int levels, int l0, int mag
   this->ly_ind = this->a * (ny * 2 - 1);
   this->lx_ind = this->a * (nx * 2 - 1);
   this->outline = new hexagonal_grid(nx, ny, levels, magnification, l0);
-  this->level_nodes = new map<int, map<string, node *> *>;
+  this->level_nodes = new map<int, my_node_map *>;
   this->level_bonds = new map<int, map<string, bond *> *>;
   this->level_broken_bonds = new map<int, map<string, bond *> *>;
   this->level_is_build = new map<int, bool>;
@@ -30,14 +30,14 @@ hierarchical_grid::hierarchical_grid(int nx, int ny, int levels, int l0, int mag
   int l = this->levels - 1;
 
   while(l >= 0){
-    map<string, node *> * nodes = new map<string, node *>;
+    my_node_map * nodes = new my_node_map();
     map<string, bond *> * bonds = new map<string, bond *>;
 
     for(auto const& level_bond : *((*(this->level_bonds))[l+1])){
       nodes_and_bonds nb = level_bond.second->refine(this->magnification);
       for(auto const& refined_node_pts : nb.nodes){
-        if(nodes->find(refined_node_pts.first) == nodes->end()){
-          (*nodes)[refined_node_pts.first] = refined_node_pts.second;
+        if(!nodes->has(refined_node_pts.first)){
+          (*nodes).insert(refined_node_pts.first, refined_node_pts.second);
         }
       }
       int count = 0;
@@ -45,20 +45,20 @@ hierarchical_grid::hierarchical_grid(int nx, int ny, int levels, int l0, int mag
         //if(bonds->find(refined_bond_pts.first) == bonds->end()){
           (*bonds)[refined_bond_pts.first] = refined_bond_pts.second;
         //}
-        node *n1 = (*nodes)[refined_bond_pts.second->n1->id];
-        node *n2 = (*nodes)[refined_bond_pts.second->n2->id];
+        node *n1 = (*nodes).value(refined_bond_pts.second->n1->id);
+        node *n2 = (*nodes).value(refined_bond_pts.second->n2->id);
         //if(!n1->bonded_to(n2))  n1->neighbors->insert(std::make_pair(n2->get_id(),n2));
         //if(!n2->bonded_to(n1))  n2->neighbors->insert(std::make_pair(n1->get_id(),n1));
-        (*(n1->neighbors))[n2->get_id()] = n2;
-        (*(n2->neighbors))[n1->get_id()] = n1;
+        n1->neighbors->insert(n2->get_id(), n2);
+        n2->neighbors->insert(n1->get_id(), n1);
       }
     }
     (*(this->level_nodes))[l] = nodes;
     (*(this->level_bonds))[l] = bonds;
 
     for(auto const& b: *((*(this->level_bonds))[l])){
-      (b.second)->n1 = (*((*(this->level_nodes))[l]))[(b.second)->n1->id];
-      (b.second)->n2 = (*((*(this->level_nodes))[l]))[(b.second)->n2->id];
+      (b.second)->n1 = (*((*(this->level_nodes))[l])).value((b.second)->n1->id);
+      (b.second)->n2 = (*((*(this->level_nodes))[l])).value((b.second)->n2->id);
     }
 
     set<string> duplicate_bonds;
@@ -78,6 +78,7 @@ hierarchical_grid::hierarchical_grid(int nx, int ny, int levels, int l0, int mag
     l-=1;
   }
 };
+
 
 void hierarchical_grid::build_eqns(){
   int a = this->a;
@@ -152,7 +153,7 @@ void hierarchical_grid::build_eqns(){
         string node_id = (*interior_node_ids)[k];
         int node_x = (*((*(this->level_nodes))[l]))[node_id]->i;
         int node_y = (*((*(this->level_nodes))[l]))[node_id]->j;
-        map <string, node *> *neighs = (*((*(this->level_nodes))[l]))[node_id]->neighbors;
+        my_map <string, node *> *neighs = (*((*(this->level_nodes))[l]))[node_id]->neighbors;
         int diag = 0;
         double load = 0;
 
@@ -221,7 +222,7 @@ void hierarchical_grid::build_eqns(){
         counter += 1;
         int node_index = k + N_interior ;
         string node_id = (*exterior_dn_node_ids)[k];
-        map<string, node *> neighs = *(*((*(this->level_nodes))[l]))[node_id]->neighbors;
+        my_map<string, node *> neighs = *(*((*(this->level_nodes))[l]))[node_id]->neighbors;
         for(auto const & neigh_pair: neighs){
           counter += 1;
           int neigh_index;
@@ -244,7 +245,7 @@ void hierarchical_grid::build_eqns(){
         counter += 1;
         string node_id = (*exterior_up_node_ids)[k];
         int node_index = k + N_interior + N_exterior_dn;
-        map<string, node *> neighs = *(*((*(this->level_nodes))[l]))[node_id]->neighbors;
+        my_node_map neighs = *(*((*(this->level_nodes))[l]))[node_id]->neighbors;
         for(auto const & neigh_pair: neighs){
           counter += 1;
           int neigh_index;
@@ -268,6 +269,5 @@ void hierarchical_grid::build_eqns(){
     l -= 1;
   }
 
-
-
 }
+

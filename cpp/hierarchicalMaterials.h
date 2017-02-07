@@ -21,12 +21,13 @@ using namespace std;
 #ifndef _Node
 #define _Node
 class coordinates_2d;
+class my_node_map;
 class node {
 
   public:
     int i, j;
     string id;
-    map<string, node *> * neighbors;
+    my_node_map * neighbors;
 
     node (int, int);
     node (const node &obj);
@@ -73,12 +74,13 @@ class hexagon {
 #define _Hexagonal_grid
 class hexagonal_unit_cell;
 class coordinates_2d;
+class my_node_map;
 class hexagonal_grid {
   public:
     int nx, ny, level, l0, magnification, a;
     map<int, hexagonal_unit_cell *> master_grid;
     hexagonal_grid(int, int, int, int, int);
-    map<string, node *> * node_map();
+    my_node_map * node_map();
     map<string, bond *> * bond_map();
     set<string> * all_cells;
     coordinates_2d node_coordinates();
@@ -146,11 +148,29 @@ class hierarchical_grid {
     bool notch, damage;
     double damage_fraction, EY;
     hexagonal_grid * outline;
-    map<int, map<string, node *> *> * level_nodes;
+    map<int, my_node_map *> * level_nodes;
     map<int, map<string, bond *> *> * level_bonds;
     map<int, map<string, bond *> *> * level_broken_bonds;
     map<int, bool> * level_is_build;
     hierarchical_grid(int, int, int, int, int, bool, bool, double, double);
     void build_eqns();
+};
+#endif
+
+#ifndef _My_map
+#define _My_map
+class my_node_map {
+  private:
+    vector <string> keys;
+    vector <node *> values;
+    map <string, int> index;
+  public:
+    int size();
+    void insert(string, node *);
+    bool has(string);
+    node * value(string);
+    string key_at(int);
+    node * value_at(int);
+    void erase(string);
 };
 #endif

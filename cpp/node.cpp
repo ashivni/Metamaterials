@@ -6,7 +6,7 @@ node::node(int i, int j){
   ostringstream stringStream;
   stringStream << "_" << i << "_" << j;
   this->id = stringStream.str();
-  this->neighbors = new map<string, node *>;
+  this->neighbors = new my_node_map();
 };
 
 node::node(const node &obj){
@@ -35,10 +35,10 @@ bool node::is_connected_to(node *target){
     if (n == target) return true;
     else  visited.insert(n);
 
-    for(auto const& x : *(n->neighbors)){
-      if( (visited.find(x.second) == visited.end()) && (queued.find(x.second) == queued.end())){
-        dq.push_back(x.second);
-        visited.insert(x.second);
+    for(int k = 0; k < this->neighbors->size(); k++){
+      if( (visited.find(this->neighbors->value_at(k)) == visited.end()) && (queued.find(this->neighbors->value_at(k)) == queued.end())){
+        dq.push_back(this->neighbors->value_at(k));
+        visited.insert(this->neighbors->value_at(k));
       }
     }
   }
@@ -68,8 +68,9 @@ void node::debond_from(node *n1){
 }
 
 
+
 bool node::bonded_to(node *n1){
-  return this->neighbors->find(n1->get_id()) != this->neighbors->end();
+  return this->neighbors->has(n1->get_id());
 };
 
 void node::add_neighbor(node *n1){
@@ -84,8 +85,8 @@ void node::add_neighbor(node *n1){
       stringStream << "[add_neighbor] Nodes partially bonded: " << this->id << " " << n1->id << endl;
       throw invalid_argument(stringStream.str());
   }*/
-  (*(this->neighbors))[n1->get_id()] = n1;
-  (*(n1->neighbors))[this->get_id()] = this;
+  this->neighbors->insert(n1->get_id(), n1);
+  n1->neighbors->insert(this->get_id(), this);
 };
 
 string node::get_id(){
