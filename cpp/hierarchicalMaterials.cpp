@@ -32,7 +32,7 @@ void check_connectivity(node *n1, node * n2){
 }
 
 int main(){
-int nx = 4, ny=4, levels=2, l0=1, magnification=6;
+int nx=5, ny=5, levels=1, l0=1, magnification=6;
 
   hierarchical_grid hg(nx, ny, levels, l0, magnification,false, false, 0.0, 1.0);
   hg.build_eqns();
@@ -54,13 +54,22 @@ int nx = 4, ny=4, levels=2, l0=1, magnification=6;
         neigh_ids.push_back(neigh_map.second->id);
       }
       sort(neigh_ids.begin(), neigh_ids.end());
-      if (l==0){
       fOut << l << "\t" << ni;
       for (auto const & neigh: neigh_ids){
         fOut << "\t" << neigh;
       }
       fOut << endl;
-      }
+    }
+
+    vector <string> bond_ids;
+    map <string, bond *> bm = *(*(hg.level_bonds))[l];
+    for(auto const & bp: bm){
+      bond_ids.push_back(bp.second->id);
+    }
+    sort(bond_ids.begin(),bond_ids.end());
+
+    for(auto const & bi:bond_ids){
+      fOut << l << "\t" << bi << endl;
     }
     l--;
   }

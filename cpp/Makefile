@@ -1,7 +1,7 @@
 IDIR =./
 CC=g++
 ODIR=obj
-CFLAGS=-std=c++11
+CFLAGS=-std=c++11 -O3
 
 _DEPS = hierarchicalMaterials.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
