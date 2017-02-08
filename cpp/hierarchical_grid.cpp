@@ -64,8 +64,8 @@ hierarchical_grid::hierarchical_grid(int nx, int ny, int levels, int l0, int mag
     set<string> duplicate_bonds;
     for(auto const& b: *((*(this->level_bonds))[l])){
       set<std::string>::iterator it = duplicate_bonds.find((b.second)->id);
-      if (it == duplicate_bonds.end()){
-        string dup_id = (b.second)->n2->id + (b.second)->n1->id;
+      if (it == duplicate_bonds.end() && (b.second)->n1->id > (b.second)->n2->id){
+        string dup_id = (b.second)->n2->id + "_" + (b.second)->n1->id;
         if ((*((*(this->level_bonds))[l])).find(dup_id) !=  (*((*(this->level_bonds))[l])).end()){
           duplicate_bonds.insert(dup_id);
         }
