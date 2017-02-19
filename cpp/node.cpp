@@ -58,13 +58,8 @@ void node::debond_from(node *n1){
       stringStream << "[debond_from] Nodes partially bonded: " << this->id << " " << n1->id << endl;
       throw invalid_argument(stringStream.str());
   }*/
-  //if (this->bonded_to(n1)){
     this->neighbors->erase(n1->get_id());
-  //}
-
-  //if (n1->bonded_to(this)){
-    n1->debond_from(this);
-  //}
+    n1->neighbors->erase(this->get_id());
 }
 
 

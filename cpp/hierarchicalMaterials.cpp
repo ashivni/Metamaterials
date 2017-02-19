@@ -32,11 +32,85 @@ void check_connectivity(node *n1, node * n2){
 }
 
 int main(){
-int nx=5, ny=5, levels=1, l0=1, magnification=6;
+std::cout.setf( std::ios_base::unitbuf );
 
-  hierarchical_grid hg(nx, ny, levels, l0, magnification,false, false, 0.0, 1.0);
-  hg.build_eqns();
+/*
+int m = 20, n = 30, nnz = 0;
+vector<int> i, j;
+vector <double> A;
+srand(1);
+for (int k = 0; k < m; k++){
+  for (int l = 0; l < n; l++){
+    if (rand()%100 > 90){
+      nnz += 1;
+      i.push_back(k);
+      j.push_back(l);
+      A.push_back((rand()%100)*1.0);
+    }
+  }
+}
+CPPSparse cs = CPPSparse(m,n,nnz,&i,&j,&A);
+for (int k = 0; k < m; k++){
+  for (int l = 0; l < n; l++){
+    int d_index = cs.data_index(k, l);
+    int d_index_loc = -1;
+    for(int t = 0; t < i.size(); t++){
+      if (i[t] == k && j[t] == l){
+        d_index_loc = t;
+      }
+    }
 
+    if (d_index == -1 && d_index_loc == -1){}
+    else if (d_index == -1){cout << "error"<< endl;}
+    else if (d_index_loc == -1){cout << "error" << endl;}
+    else if (cs.cs_c->x[d_index] != A[d_index_loc]) {cout << "error" << endl;}
+  }
+}
+
+int m = 3, n = 3, nnz = 4;
+vector<int> i = {0,1,2,0}, j = {0,1,2,2};
+vector <double> A = {1, 1, 1, 2.0};
+CPPSparse cs = CPPSparse(m,n,nnz,&i,&j,&A);
+vector <double> b = {1, 2, 3};
+cs.CPPSprint();
+for(auto const & t: cs.sp_index_t){
+  cout << t.first << ":" << t.second << endl;
+}
+cs.update(0,2,0.0);
+cs.CPPSprint();
+vector <double> x = cs.solve(b);
+cout << "x: " << "\t";
+for(auto const & pp: x){
+  cout << pp << "\t";
+}
+cout << endl;
+return 1;
+*/
+/*
+linear_system ls = linear_system(m,n,nnz,&i,&j,&A,&b);
+
+x = ls.solve();
+cout << "x: " << "\t";
+for(auto const & pp: x){
+  cout << pp << "\t";
+}
+cout << endl;
+
+return 1;
+*/
+
+int nx=30, ny=30, levels=1, l0=1, magnification=6;
+
+  hierarchical_grid hg(nx, ny, levels, l0, magnification,true, false, 0.0, 1.0);
+  //hg.build_eqns();
+  //hg.solve();
+  //hg.step();
+  //hg.step();
+  hg.simulate_fracture(0);
+  cout << "Steps to break: " << hg.n_step << endl;
+  hg.dump();
+
+/*
   int l = hg.levels;
   ofstream fOut;
   fOut.open("C_Out.txt");
@@ -75,7 +149,7 @@ int nx=5, ny=5, levels=1, l0=1, magnification=6;
   }
 
   fOut.close();
-
+*/
 /*
   hexagonal_grid hg (nx, ny, levels, magnification, l0);
   ofstream fOut;
