@@ -34,6 +34,7 @@ class node {
 
     node (int, int);
     node (const node &obj);
+    ~node();
     string get_id();
     bool bonded_to(node *);
     void add_neighbor(node *);
@@ -171,6 +172,8 @@ class hierarchical_grid {
     void simulate_fracture(int);
     bool is_broken();
     void dump(string pref = "level");
+    ~hierarchical_grid();
+    void destruct();
 };
 #endif
 

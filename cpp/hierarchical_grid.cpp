@@ -415,6 +415,7 @@ void hierarchical_grid::solve(){
       for(int k = 0; k < B->cs_c->n; k++){
         B_vec.push_back(temp[k]);
       }
+      delete [] temp;
 
       vector < double > interior_vol = (*L).solve(B_vec);
       for(int k = 0; k < interior_vol.size(); k++){
@@ -439,6 +440,9 @@ void hierarchical_grid::solve(){
       }
       if(abs(curr_up + curr_dn) > 1E-2){
         throw runtime_error("Net current flux");
+      }
+      if(this->level_curr->find(l) != this->level_curr->end()){
+        delete (*(this->level_curr))[l];
       }
       (*(this->level_curr))[l] = new CPPSparse(curr);
       (*(this->level_curr_dn))[l] = curr_dn;
@@ -647,4 +651,112 @@ void hierarchical_grid::dump(string pref){
     outFile.close();
     l -= 1;
   }
+}
+
+hierarchical_grid::~hierarchical_grid(){
+  //this->destruct();
+}
+
+void hierarchical_grid::destruct(){
+  for(auto const & t: *(this->level_C)){
+    delete t.second;
+  }
+  delete this->level_C;
+
+  for(auto const & t: *(this->level_C)){
+    delete t.second;
+  }
+  delete this->level_C;
+
+  delete this->level_is_build;
+
+  delete this->level_is_solved;
+
+  for(auto const & t: *(this->level_C)){
+    delete t.second;
+  }
+  delete this->level_C;
+
+  for(auto const & t: *(this->level_B)){
+    delete t.second;
+  }
+  delete this->level_B;
+
+  for(auto const & t: *(this->level_L)){
+    delete t.second;
+  }
+  delete this->level_L;
+
+  for(auto const & t: *(this->level_V)){
+    delete t.second;
+  }
+  delete this->level_V;
+
+  for(auto const & t: *(this->level_curr)){
+    delete t.second;
+  }
+  delete this->level_curr;
+
+  delete this->level_curr_dn;
+
+  for(auto const & t: *(this->level_stress)){
+    delete t.second;
+  }
+  delete this->level_stress;
+
+  for(auto const & t: *(this->level_strain)){
+    delete t.second;
+  }
+  delete this->level_strain;
+
+  for(auto const & t: *(this->level_voltage)){
+    delete t.second;
+  }
+  delete this->level_voltage;
+
+  for(auto const & t: *(this->level_current)){
+    delete t.second;
+  }
+  delete this->level_current;
+
+  for(auto const & t: *(this->level_scaled_stress)){
+    delete t.second;
+  }
+  delete this->level_scaled_stress;
+
+
+  for(auto const & t: *(this->level_interior_node_indices)){
+    delete t.second;
+  }
+  delete this->level_interior_node_indices;
+
+  for(auto const & t: *(this->level_exterior_up_node_indices)){
+    delete t.second;
+  }
+  delete this->level_exterior_up_node_indices;
+
+  for(auto const & t: *(this->level_exterior_dn_node_indices)){
+    delete t.second;
+  }
+  delete this->level_exterior_dn_node_indices;
+
+  for(auto const & t: *(this->level_interior_node_ids)){
+    delete t.second;
+  }
+  delete this->level_interior_node_ids;
+
+  for(auto const & t: *(this->level_exterior_up_node_ids)){
+    delete t.second;
+  }
+  delete this->level_exterior_up_node_ids;
+
+  for(auto const & t: *(this->level_exterior_dn_node_ids)){
+    delete t.second;
+  }
+  delete this->level_exterior_dn_node_ids;
+
+  for(auto const & t: *(this->level_int_vars)){
+    delete t.second;
+  }
+  delete this->level_int_vars;
 }
