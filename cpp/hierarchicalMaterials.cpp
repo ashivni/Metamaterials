@@ -99,18 +99,19 @@ cout << endl;
 return 1;
 */
 
-int nx=30, ny=30, levels=1, l0=1, magnification=6;
+int nx=17, ny=10, levels=1, l0=1, magnification=6;
 
   hierarchical_grid hg(nx, ny, levels, l0, magnification,true, false, 0.0, 1.0);
-  //hg.build_eqns();
+  hg.build_eqns();
   //hg.solve();
   //hg.step();
   //hg.step();
-  hg.simulate_fracture(0);
+  cout << '\a';
+  //hg.simulate_fracture(0);
   cout << "Steps to break: " << hg.n_step << endl;
   hg.dump();
 
-/*
+
   int l = hg.levels;
   ofstream fOut;
   fOut.open("C_Out.txt");
@@ -147,9 +148,8 @@ int nx=30, ny=30, levels=1, l0=1, magnification=6;
     }
     l--;
   }
-
   fOut.close();
-*/
+
 /*
   hexagonal_grid hg (nx, ny, levels, magnification, l0);
   ofstream fOut;

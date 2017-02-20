@@ -9,6 +9,10 @@ node::node(int i, int j){
   this->neighbors = new map<string, node *>;
 };
 
+node::~node(){
+  delete this->neighbors;
+}
+
 node::node(const node &obj){
   this->i = obj.i;
   this->j = obj.j;

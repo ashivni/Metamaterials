@@ -1,7 +1,7 @@
 IDIR =./
 CC=g++
 ODIR=obj
-CFLAGS=-std=c++11 -O3
+CFLAGS=-std=c++11 -O3 -g
 INCLUDES=-I/Users/ashivnishekhawat/Software/Suitesparse/SuiteSparse/include
 LDIRS=-L/Users/ashivnishekhawat/Software/Suitesparse/SuiteSparse/lib -L/Users/ashivnishekhawat/Software/Suitesparse/SuiteSparse/CXSParse/Lib
 

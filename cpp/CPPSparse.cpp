@@ -195,7 +195,7 @@ CPPSparse::CPPSparse(const CPPSparse &B){
       this->cs_c->i[k] = B.cs_c->i[k];
       this->cs_c->x[k] = B.cs_c->x[k];
     }
-    for(int k = 0; k < B.cs_c->n+1; k++){
+    for(int k = 0; k < B.cs_c->n; k++){
       this->cs_c->p[k] = B.cs_c->p[k];
     }
     this->cs_c-> nzmax = B.cs_c->nzmax;
@@ -300,7 +300,8 @@ CPPSparse CPPSparse::operator + (const CPPSparse &B) const {
 CPPSparse CPPSparse::subtract(const CPPSparse &B)const {
   if (this->cs_c->n != B.cs_c->n || this->cs_c->m != B.cs_c->m){
     throw invalid_argument("Inconsistent dimensions in add.");
-  }  CPPSparse m;
+  }
+  CPPSparse m;
   m.cs_c = cs_add(this->cs_c, B.cs_c, 1.0, -1.0);
   m.cs_t = csc_to_cst(m.cs_c);
   m.make_index();
