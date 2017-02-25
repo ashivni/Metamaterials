@@ -99,17 +99,30 @@ cout << endl;
 return 1;
 */
 
-int nx=17, ny=10, levels=1, l0=1, magnification=6;
+int nx=17, ny=10, levels=2, l0=1, magnification=16;
 
   hierarchical_grid hg(nx, ny, levels, l0, magnification,true, false, 0.0, 1.0);
-  hg.build_eqns();
+  //hg.build_eqns();
   //hg.solve();
   //hg.step();
   //hg.step();
   cout << '\a';
-  //hg.simulate_fracture(0);
+  hg.solve();
+  hg.save();
+  return 1;
+  hg.simulate_fracture(5);
   cout << "Steps to break: " << hg.n_step << endl;
   hg.dump();
+  vector<vector<double>> v = stress(hg, 0);
+  vector<double> dist = v[0];
+  vector<double> curr = v[1];
+
+  ofstream stress_out;
+  stress_out.open("stress.txt");
+  for(int k = 0; k < dist.size(); k++){
+    stress_out << dist[k] << "\t" << curr[k] << endl;
+  }
+  stress_out.close();
 
 
   int l = hg.levels;

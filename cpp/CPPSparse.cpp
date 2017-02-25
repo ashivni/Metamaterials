@@ -92,7 +92,7 @@ cs_di * csc_to_cst(cs_di * csc){
 
 void CPPSparse::make_index(){
   this->sp_index_c.erase(this->sp_index_c.begin(), this->sp_index_c.end());
-  for(int col = 0; col < this->cs_c->n; col++){
+  for(int col = 0; col < this->cs_c->m; col++){
     for(int k = this->cs_c->p[col]; k < this->cs_c->p[col+1]; k++){
       int row = this->cs_c->i[k];
       ostringstream stringStream;

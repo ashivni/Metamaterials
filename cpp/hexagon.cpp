@@ -58,3 +58,17 @@ std::ostream& operator<< (std::ostream &out, const hexagon &h){
   }
   return out;
 }
+
+void hexagon::destruct(){
+  for(auto const & t: this->nodes){
+    delete t;
+  }
+
+  for(auto const & t: this->bonds){
+    delete t;
+  }
+}
+
+hexagon::~hexagon(){
+  this->destruct();
+}
