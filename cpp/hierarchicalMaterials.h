@@ -71,6 +71,8 @@ class hexagon {
     hexagon(int, int, int);
     coordinates_2d coordinates();
     friend std::ostream& operator<< (std::ostream &, const hexagon &);
+    void destruct();
+    ~hexagon();
 };
 #endif
 
@@ -172,8 +174,11 @@ class hierarchical_grid {
     void simulate_fracture(int);
     bool is_broken();
     void dump(string pref = "level");
+    void save();
     ~hierarchical_grid();
     void destruct();
+    double bond_current(bond *, int );
+
 };
 #endif
 
@@ -225,4 +230,9 @@ cs_di * csc_to_cst(cs_di *);
 
 #ifndef __cplusplus
 #define __cplusplus
+#endif
+
+#ifndef _UtilFuncs
+#define _UtilFuncs
+vector<vector<double>> stress(hierarchical_grid, int);
 #endif
