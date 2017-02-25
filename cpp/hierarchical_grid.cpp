@@ -144,6 +144,8 @@ hierarchical_grid::hierarchical_grid(int nx, int ny, int levels, int l0, int mag
       }
 
       map<string, bond *> * notched_bonds = new map<string, bond *>;
+      int largest_notched = numeric_limits<int>::min();
+      int smallest_unnotched = numeric_limits<int>::max();
       for(auto const & nm : *(*(this->level_nodes))[l]){
         int node_x = nm.second->i, node_y = nm.second->j;
         map<string, node *> neigh_map;
@@ -167,6 +169,10 @@ hierarchical_grid::hierarchical_grid(int nx, int ny, int levels, int l0, int mag
               (*notched_bonds)[b21_id] = (*(*(this->level_bonds))[l])[b21_id];
               (*(this->level_bonds))[l]->erase(b21_id);
             }
+            largest_notched = largest_notched > node_x ? largest_notched : node_x;
+          }
+          else if((node_y - j_mid)*(neigh_y - j_mid) < 0){
+            smallest_unnotched = smallest_unnotched < node_x ? smallest_unnotched : node_x;
           }
         }
       }
@@ -373,7 +379,6 @@ void hierarchical_grid::build_eqns(){
       (*(this->level_exterior_up_node_ids))[l] = exterior_up_node_ids;
       map<string, int> * int_vars = new map<string, int>;
       (*int_vars)["N_interior"] = N_interior;
-      cout << "Level, N_vars: " << l << ", " << N_interior << endl;
       (*int_vars)["N_exterior_dn"] = N_exterior_dn;
       (*int_vars)["N_exterior_up"] = N_exterior_up;
       (*int_vars)["i_range"] = i_max - i_min + 1;
@@ -453,9 +458,7 @@ void hierarchical_grid::solve(){
 }
 
 void hierarchical_grid::step(){
-  cout << "Building: " << endl;
   this->build_eqns();
-  cout << "Solving: " << endl;
   this->solve();
   int l = this->levels;
   double EY = this->EY;
@@ -651,6 +654,84 @@ void hierarchical_grid::dump(string pref){
     outFile.close();
     l -= 1;
   }
+}
+
+double hierarchical_grid::bond_current(bond *b, int l){
+  int N_interior = (*((*(this->level_int_vars))[l]))["N_interior"];
+  int N_exterior_up = (*((*(this->level_int_vars))[l]))["N_exterior_up"];
+  int N_exterior_dn = (*((*(this->level_int_vars))[l]))["N_exterior_dn"];
+  int N  = N_interior + N_exterior_dn + N_exterior_up;
+  map <string, int> * interior_node_indices = (*(this->level_interior_node_indices))[l];
+  map <string, int> * exterior_up_node_indices = (*(this->level_exterior_up_node_indices))[l];
+  map <string, int> * exterior_dn_node_indices = (*(this->level_exterior_dn_node_indices))[l];
+
+  string n1_b_id = b->n1->id;
+  string n2_b_id = b->n2->id;
+  int n1_ind = -1, n2_ind = -1;
+
+  if(interior_node_indices->find(n1_b_id) != interior_node_indices->end()){
+    n1_ind = (*interior_node_indices)[n1_b_id];
+  }
+  else if(exterior_dn_node_indices->find(n1_b_id) != exterior_dn_node_indices->end()){
+    n1_ind = (*exterior_dn_node_indices)[n1_b_id] + N_interior;
+  }
+  else{
+    n1_ind = (*exterior_up_node_indices)[n1_b_id] + N_interior + N_exterior_dn;
+  }
+
+  if(interior_node_indices->find(n2_b_id) != interior_node_indices->end()){
+    n2_ind = (*interior_node_indices)[n2_b_id];
+  }
+  else if(exterior_dn_node_indices->find(n2_b_id) != exterior_dn_node_indices->end()){
+    n2_ind = (*exterior_dn_node_indices)[n2_b_id] + N_interior;
+  }
+  else{
+    n2_ind = (*exterior_up_node_indices)[n2_b_id] + N_interior + N_exterior_dn;
+  }
+
+  return (*(this->level_curr))[l]->get(n1_ind, n2_ind);
+}
+
+void hierarchical_grid::save(){
+    ostringstream s;
+    s << "NX_" << this->nx << "_NY_" << this->ny << "_Mag_" << this->magnification << "_Levels_" << this->levels << ".out";
+    string fName = s.str();
+    ofstream outFile;
+    outFile.open(fName,std::ios_base::out);
+
+    vector<vector<double>> v = stress(*this, 0);
+    vector<double> dist = v[0];
+    vector<double> curr = v[1];
+
+    CPPSparse * level_curr = (*(this->level_curr))[0];
+    double curr_dn = (*(this->level_curr_dn))[0];
+    double max_cur = -numeric_limits<double>::infinity();
+    for(int k = 0; k < level_curr->cs_c->nzmax; k++){
+      max_cur = abs((level_curr->cs_c->x)[k]) > max_cur ? abs((level_curr->cs_c->x)[k]) : max_cur;
+    }
+
+    double level_density = (1.0*( (*(this->level_bonds))[0]->size()))/((this->lx) * (this->ly));
+
+    outFile << "S level_density: " << level_density << endl;
+    outFile << "S max_cur: " << max_cur << endl;
+    outFile << "S curr_dn: " << curr_dn << endl;
+    outFile << "S mag: " << this->magnification << endl;
+    outFile << "S lx: " << this->lx << endl;
+    outFile << "S ly: " << this->ly << endl;
+    outFile << "S notch_len: " << (*(this->level_notch_len))[0] << endl;
+    outFile << "V curr: ";
+    for(int k = 0; k < curr.size(); k++){
+    outFile << curr[k] << " ";
+    }
+    outFile << endl;
+
+    outFile << "V dist: ";
+    for(int k = 0; k < dist.size(); k++){
+    outFile << dist[k] << " ";
+    }
+    outFile << endl;
+
+    outFile.close();
 }
 
 hierarchical_grid::~hierarchical_grid(){

@@ -85,19 +85,15 @@ nodes_and_bonds bond::refine(int magnification){
   for(k=0; k<magnification; k++){
     hexagon * h = new hexagon(this->n1->i + k*t_vec[0], this->n1->j + k*t_vec[1], l);
     for(auto const& n : h->nodes){
-      //if (nb.nodes.find(n->id) ==  nb.nodes.end()){
-        nb.nodes[n->id] = n;
-      //}
+      node * new_node = new node(n->i, n->j);
+      nb.nodes[new_node->id] = new_node;
     }
 
     for(auto const& b : h->bonds){
-      //if (nb.bonds.find(b->id) ==  nb.bonds.end()){
-        nb.bonds[b->id] = b;
-        //try{
-          nb.nodes[b->n1->id]->add_neighbor(nb.nodes[b->n2->id]);
-        //} catch (const invalid_argument & e){}
-      //}
+      bond * new_bond = new bond(nb.nodes[b->n1->id], nb.nodes[b->n2->id], b->bond_type);
+      nb.bonds[new_bond->id] = new_bond;
     }
+    delete h;
   }
 
   return nb;
